@@ -3,13 +3,18 @@
     <form @submit.prevent="submitHandler" class="w-full">
       <input
         type="text"
-        v-model="inputValue"
+        v-model="inputValue.content"
         placeholder="Type what you have to do"
         class="w-[90%] rounded-md p-2 text-center h-full"
       />
       <button
-        class="text-white text-xl bg-violet-500 p-2 w-[10%] rounded-sm"
+        :class="{
+          'text-white text-xl  p-2 w-[10%] rounded-sm': true,
+          'bg-violet-500': !isDisabled,
+          'bg-gray-500': isDisabled,
+        }"
         type="submit"
+        :disabled="isDisabled"
       >
         +
       </button>
@@ -21,13 +26,28 @@
 export default {
   data() {
     return {
-      inputValue: "",
+      inputValue: {
+        id: 0,
+        content: "",
+        complete: false,
+      },
+      isDisabled: true,
     };
+  },
+  watch: {
+    "inputValue.content": function (content) {
+      this.isDisabled = content.length === 0;
+    },
   },
   methods: {
     submitHandler() {
-      this.$emit("submit-event", this.inputValue);
-      this.inputValue = "";
+      const newTodo = {
+        id: this.inputValue.id++,
+        content: this.inputValue.content,
+        complete: this.inputValue.complete,
+      };
+      this.$emit("submit-event", newTodo);
+      this.inputValue.content = "";
     },
   },
 };
